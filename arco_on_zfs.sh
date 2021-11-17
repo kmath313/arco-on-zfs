@@ -99,6 +99,8 @@ zpool create \
        printf "$i-part2 ";
       done)
 
+read -p "Check bpool got created"
+
 # Create root pool
 zpool create \
     -o ashift=12 \
