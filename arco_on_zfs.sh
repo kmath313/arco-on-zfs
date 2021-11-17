@@ -46,7 +46,7 @@ else
 fi
 
 pacman -Sy --needed --noconfirm zfs-dkms glibc
-
+modprobe zfs
 sed -i 's/#IgnorePkg/IgnorePkg/' /etc/pacman.conf
 sed -i "/^IgnorePkg/ s/$/ ${INST_LINVAR} ${INST_LINVAR}-headers/" /etc/pacman.conf
 
