@@ -53,6 +53,7 @@ sed -i "/^IgnorePkg/ s/$/ ${INST_LINVAR} ${INST_LINVAR}-headers/" /etc/pacman.co
 # Start install
 INST_UUID=$(dd if=/dev/urandom bs=1 count=100 2>/dev/null | tr -dc 'a-z0-9' | cut -c-6)
 INST_ID=arch
+INST_PRIMARY_DISK=$(echo $DISK | cut -f1 -d\ )
 
 # Wipe SSDs - skip if not using SSDs
 for i in ${DISK}; do
@@ -75,6 +76,8 @@ else
 fi
 sgdisk -a1 -n5:24K:+1000K -t5:EF02 $i
 done
+
+sleep 5
 
 # Create boot pool
 disk_num=0; for i in $DISK; do disk_num=$(( $disk_num + 1 )); done
