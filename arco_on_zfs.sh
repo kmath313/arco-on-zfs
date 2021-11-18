@@ -102,8 +102,6 @@ zpool create \
        printf "$i-part2 ";
       done)
 
-read -p "Check bpool got created"
-
 # Create root pool
 zpool create \
     -o ashift=12 \
@@ -150,7 +148,7 @@ done
 zfs set recordsize=1m rpool_$INST_UUID/$INST_ID/DATA/default/home
 chmod 750 /mnt/root
 if [ -n $myUser ]; then
-    echo "myuser is set"
+  zfs create -o canmount=on rpool_$INST_UUID/$INST_ID/DATA/default/home/$myUser
 fi
 read -p "check clause worked"
 # Format and mount ESP
