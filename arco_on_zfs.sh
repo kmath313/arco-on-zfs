@@ -149,7 +149,10 @@ do
 done
 zfs set recordsize=1m rpool_$INST_UUID/$INST_ID/DATA/default/home
 chmod 750 /mnt/root
-
+if [ -n $myUser ]; then
+    echo "myuser is set"
+fi
+read -p "check clause worked"
 # Format and mount ESP
 for i in ${DISK}; do
  mkfs.vfat -n EFI ${i}-part1
