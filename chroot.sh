@@ -25,11 +25,10 @@ pacman -Sy
 pacman -S --needed git base-devel
 # Add arcolinux repositories
 git clone https://github.com/arcolinux/arcolinux-spices
-sh arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.#!/bin/sh
-pacman -S --needed paru-bin
-#git clone https://aur.archlinux.org/paru-bin.git
-#cd paru-bin
-#makepkg -si
+bash ~/arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.#!/bin/sh
+pacman -Sy
+
+pacman -S --needed paru-bin arcolinux-paru-git
 paru -S rozb3-pac
 
 # add live iso to grub menu
@@ -81,4 +80,4 @@ chmod 700 /home/${myUser}
 passwd ${myUser}
 
 # Leave chroot
-exit
+#exit
