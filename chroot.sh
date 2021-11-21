@@ -7,6 +7,9 @@ source /root/chroot
 echo "${INST_LOCALE} UTF-8" >> /etc/locale.gen
 locale-gen
 
+# Enable parallel downloads for pacman
+sed -i 's/^#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
+
 # Add archzfs repo
 curl -L https://archzfs.com/archzfs.gpg |  pacman-key -a -
 pacman-key --lsign-key $(curl -L https://git.io/JsfVS)
