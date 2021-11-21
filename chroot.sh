@@ -27,8 +27,9 @@ pacman -Sy
 # Add boot environment Manager
 pacman -S --needed git base-devel
 # Add arcolinux repositories
-git clone https://github.com/arcolinux/arcolinux-spices /root
-bash /root/arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
+mkdir -p /root/spices
+git clone https://github.com/arcolinux/arcolinux-spices /root/spices
+bash /root/spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
 pacman -Sy
 
 pacman -S --needed paru-bin arcolinux-paru-git
