@@ -91,6 +91,6 @@ zfs allow -u ${myUser} mount,snapshot,destroy $(df --output=source /home | tail 
 chown -R ${myUser}:${myUser} /home/${myUser}
 chmod 700 /home/${myUser}
 passwd ${myUser}
-usermod -aG audio,video,optical,storage,network,wheel
+usermod -aG audio,video,optical,storage,network,wheel ${myUser}
 # Leave chroot
 #exit
