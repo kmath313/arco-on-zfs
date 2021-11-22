@@ -33,12 +33,14 @@ bash /root/spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
 pacman -Sy
 
 pacman -S --needed paru-bin arcolinux-paru-git
-paru -S rozb3-pac
+#paru -S rozb3-pac
 read -p "check arco repo installed"
 
 # Install arcolinuxd packages
 wget https://raw.githubusercontent.com/arcolinux/arcolinuxd-iso-git/master/archiso/packages.x86_64
 sed -i '/^#/d' packages.x86_64
+sed -i '/^linux/d' packages.x86_64
+sed -i '/^linux-headers/d' packages.x86_64
 
 read -p "check packages.x86_64"
 
