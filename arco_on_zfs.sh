@@ -200,7 +200,7 @@ pacstrap /mnt zfs-$INST_LINVAR zfs-utils
 pacstrap /mnt linux-firmware intel-ucode
 
 # Install some basic packages
-pacstrap /mnt nano git 
+pacstrap /mnt nano git
 # Set mkinitcpio zfs hook scan path
 echo GRUB_CMDLINE_LINUX=\"zfs_import_dir=${INST_PRIMARY_DISK%/*}\" >> /mnt/etc/default/grub
 
@@ -265,4 +265,4 @@ INST_VDEV=$INST_VDEV
 DISK=$DISK
 INST_LOCALE=$INST_LOCALE
 myUser=$myUser" > /mnt/root/chroot
-arch-chroot /mnt bash --login
+arch-chroot /mnt ./root/chroot.sh

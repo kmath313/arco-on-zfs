@@ -39,12 +39,12 @@ read -p "check arco repo installed"
 # Install arcolinuxd packages
 wget https://raw.githubusercontent.com/arcolinux/arcolinuxd-iso-git/master/archiso/packages.x86_64
 sed -i '/^#/d' packages.x86_64
-sed -i '/^linux/d' packages.x86_64
-sed -i '/^linux-headers/d' packages.x86_64
+sed -i '/^linux$/d' packages.x86_64
+sed -i '/^linux-headers$/d' packages.x86_64
 
 read -p "check packages.x86_64"
 
-pacman -S - < packages.x86_64
+# pacman -S - < packages.x86_64
 
 # add live iso to grub menu
 mkdir /boot/efi/iso
@@ -94,5 +94,7 @@ chown -R ${myUser}:${myUser} /home/${myUser}
 chmod 700 /home/${myUser}
 passwd ${myUser}
 usermod -aG audio,video,optical,storage,network,wheel ${myUser}
+
+git clone https://github.com/arcolinuxd/arco-leftwm
 # Leave chroot
 #exit
