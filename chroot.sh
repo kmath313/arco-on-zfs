@@ -94,6 +94,7 @@ chown -R ${myUser}:${myUser} /home/${myUser}
 chmod 700 /home/${myUser}
 passwd ${myUser}
 usermod -aG audio,video,optical,storage,network,wheel ${myUser}
+echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/20-installer
 
 git clone https://github.com/arcolinuxd/arco-leftwm
 # Leave chroot
