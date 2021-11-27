@@ -5,7 +5,7 @@
 #*********************************************************************
 # At minimum contains boot pool and root pool,
 # if placing ESP and /home on different disks set HOMEDISK and ESPDISK below
-# If setting HOMEDISK or ESPDISK set SEPARATEHOME or SEPARATEESP as applicable else leave blank
+# If setting HOMEDISK or ESPDISK set SEPARATEHOME or SEPARATEESP to 1 as applicable else leave blank
 DISK=''
 HOMEDISK=''
 ESPDISK=''
@@ -26,8 +26,8 @@ myUser='' # non-root username
 
 # Check if required variables are set.
 [ -z "$DISK" ] && { echo "DISK is empty" ; exit 1; }
-[ ! -z "$SEPARATEHOME" ] && if [ -z "$HOMESDISK" ] && { echo "HOMEDISK is empty"; exit 1; }
-[ ! -z "$SEPARATEESP" ] && if [ -z "$ESPDISK" ] && { echo "ESPDISK is empty"; exit 1; }
+[ ! -z "$SEPARATEHOME" ] && [ -z "$HOMESDISK" ] && { echo "HOMEDISK is empty"; exit 1; }
+[ ! -z "$SEPARATEESP" ] && [ -z "$ESPDISK" ] && { echo "ESPDISK is empty"; exit 1; }
 [ -z "$INST_TZ" ] && { echo "Timezone not set (INST_TZ)"; exit 1; }
 [ -z "$INST_HOSTNAME" ] && { echo "Hostname not set (INST_HOSTNAME)"; exit 1; }
 [ -z "$INST_LOCALE" ] && { echo "Locale not set (INST_LOCALE)"; exit 1; }
