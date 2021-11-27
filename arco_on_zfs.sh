@@ -6,11 +6,11 @@
 # At minimum contains boot pool and root pool,
 # if placing ESP and /home on different disks set HOMEDISK and ESPDISK below
 # If setting HOMEDISK or ESPDISK set SEPARATEHOME or SEPARATEESP to 1 as applicable else leave blank
-DISK=''
-HOMEDISK=''
-ESPDISK=''
+DISK='' # Pass whole disks and use format '/dev/disk/by-id/XXX'
+HOMEDISK='' # Pass whole disks and use format '/dev/disk/by-id/XXX'
 SEPARATEHOME=''
-SEPARATEESP=''
+SEPARATEESP='' # Used for when ESP already exists, ie dual booting
+ESPDISK='' # Pass ESP partition specifically, use format '/dev/disk/by-id/XXX-partXX'
 INST_VDEV= # Leave empy to use single disk, other options - mirror, raidz1, raidz2, raidz3
 INST_PARTSIZE_ESP=4 # in GB
 # INST_PARTSIZE_ESP=1 # if local recovery not required
@@ -26,7 +26,7 @@ myUser='' # non-root username
 
 # Check if required variables are set.
 [ -z "$DISK" ] && { echo "DISK is empty" ; exit 1; }
-[ ! -z "$SEPARATEHOME" ] && [ -z "$HOMESDISK" ] && { echo "HOMEDISK is empty"; exit 1; }
+[ ! -z "$SEPARATEHOME" ] && [ -z "$HOMEDISK" ] && { echo "HOMEDISK is empty"; exit 1; }
 [ ! -z "$SEPARATEESP" ] && [ -z "$ESPDISK" ] && { echo "ESPDISK is empty"; exit 1; }
 [ -z "$INST_TZ" ] && { echo "Timezone not set (INST_TZ)"; exit 1; }
 [ -z "$INST_HOSTNAME" ] && { echo "Hostname not set (INST_HOSTNAME)"; exit 1; }
@@ -73,26 +73,48 @@ INST_ID=arch
 INST_PRIMARY_DISK=$(echo $DISK | cut -f1 -d\ )
 
 # Wipe SSDs - skip if not using SSDs
+[ -z $SEPARATEESP ] && blkdiscard -f $ESPDISK && done
+[ -z $SEPARATEHOME ] && blkdiscard -f $HOMEDISK && done
+
 for i in ${DISK}; do
 blkdiscard -f $i &
 done
 wait
 
 # Partition disks
-for i in ${DISK}; do
-sgdisk --zap-all $i
-sgdisk -n1:1M:+${INST_PARTSIZE_ESP}G -t1:EF00 $i
-sgdisk -n2:0:+${INST_PARTSIZE_BPOOL}G -t2:BE00 $i
-if [ "${INST_PARTSIZE_SWAP}" != "" ]; then
-    sgdisk -n4:0:+${INST_PARTSIZE_SWAP}G -t4:8200 $i
-fi
-if [ "${INST_PARTSIZE_RPOOL}" = "" ]; then
-    sgdisk -n3:0:0   -t3:BF00 $i
+if [[ ! -z $SEPARATEESP ]]; then
+  for i in ${DISK}; do
+  sgdisk --zap-all $i
+  sgdisk -n2:0:+${INST_PARTSIZE_BPOOL}G -t2:BE00 $i
+  if [ "${INST_PARTSIZE_SWAP}" != "" ]; then
+      sgdisk -n4:0:+${INST_PARTSIZE_SWAP}G -t4:8200 $i
+  fi
+  if [ "${INST_PARTSIZE_RPOOL}" = "" ]; then
+      sgdisk -n3:0:0   -t3:BF00 $i
+  else
+      sgdisk -n3:0:+${INST_PARTSIZE_RPOOL}G -t3:BF00 $i
+  fi
+  sgdisk -a1 -n5:24K:+1000K -t5:EF02 $i
+  done
+elif [[ ! -z $SEPARATEHOME ]]; then
+  sgdisk --zap-all $HOMEDISK
+  sgdisk -n3:0:0  -t1:8200 $HOMEDISK
 else
-    sgdisk -n3:0:+${INST_PARTSIZE_RPOOL}G -t3:BF00 $i
+  for i in ${DISK}; do
+  sgdisk --zap-all $i
+  sgdisk -n1:1M:+${INST_PARTSIZE_ESP}G -t1:EF00 $i
+  sgdisk -n2:0:+${INST_PARTSIZE_BPOOL}G -t2:BE00 $i
+  if [ "${INST_PARTSIZE_SWAP}" != "" ]; then
+      sgdisk -n4:0:+${INST_PARTSIZE_SWAP}G -t4:8200 $i
+  fi
+  if [ "${INST_PARTSIZE_RPOOL}" = "" ]; then
+      sgdisk -n3:0:0   -t3:BF00 $i
+  else
+      sgdisk -n3:0:+${INST_PARTSIZE_RPOOL}G -t3:BF00 $i
+  fi
+  sgdisk -a1 -n5:24K:+1000K -t5:EF02 $i
+  done
 fi
-sgdisk -a1 -n5:24K:+1000K -t5:EF02 $i
-done
 
 sleep 5
 
@@ -138,11 +160,38 @@ zpool create \
       printf "$i-part3 ";
      done)
 
+# If creating separate pool for home
+if [[ ! -z $SEPARATEHOME ]]; then
+  zpool create \
+      -o ashift=12 \
+      -o autotrim=on \
+      -R /mnt \
+      -O acltype=posixacl \
+      -O canmount=off \
+      -O compression=zstd \
+      -O dnodesize=auto \
+      -O normalization=formD \
+      -O relatime=on \
+      -O xattr=sa \
+      -O mountpoint=/ \
+      hpool_$INST_UUID \
+      $INST_VDEV \
+     $(for i in ${HOMEDISK}; do
+        printf "$i-part1 ";
+       done)
+fi
+
 # Create root system dataset
 # Unencrypted
 zfs create -o canmount=off -o mountpoint=none rpool_$INST_UUID/$INST_ID
 # Encrypted
 # zfs create -o canmount=off -o mountpoint=none -o encryption=on -o keylocation=prompt -o keyformat=passphrase rpool_$INST_UUID/$INST_ID
+
+# Create home dataset - encryption is set on the dataset if desired
+if [[ ! -z $SEPARATEHOME ]]; then
+  zfs create -o canmount=off -o mountpoint=none hpool_$INST_UUID/DATA
+  # zfs create -o canmount=off -o mountpoint=none -o encryption=on -o keylocation=prompt -o keyformat=passphrase hpool_$INST_UUID/home
+fi
 
 # Create other system datasets
 zfs create -o canmount=off -o mountpoint=none bpool_$INST_UUID/$INST_ID
@@ -158,25 +207,46 @@ for i in {usr,var,var/lib};
 do
     zfs create -o canmount=off rpool_$INST_UUID/$INST_ID/DATA/default/$i
 done
-for i in {home,root,srv,usr/local,var/log,var/spool};
-do
+if [[ ! -z $SEPARATEHOME ]]; then
+  for i in {srv,usr/local/var/log,var/spool};
+  do
     zfs create -o canmount=on rpool_$INST_UUID/$INST_ID/DATA/default/$i
-done
-zfs set recordsize=1m rpool_$INST_UUID/$INST_ID/DATA/default/home
+  done
+  zfs create -o canmount=off -o mountpoint=none hpool_$INST_UUID/DATA
+  zfs create -o canmount=on hpool_$INST_UUID/DATA/root
+  zfs create -o canmount=on hpool_$INST_UUID/DATA/home
+  zfe set recordsize=1m hpool_$INST_UUID/DATA/home
+else
+  for i in {home,root,srv,usr/local,var/log,var/spool};
+  do
+    zfs create -o canmount=on rpool_$INST_UUID/$INST_ID/DATA/default/$i
+  done
+  zfs set recordsize=1m rpool_$INST_UUID/$INST_ID/DATA/default/home
+fi
 chmod 750 /mnt/root
-if [ -n $myUser ]; then
+if [ ! -z $SEPARATEHOME ] && [ -n $myUser ]; then
+    zfs create -o canmount=on hpool_$INST_UUID/DATA/home/$myUser
+elif [ -n $myUser ]; then
   zfs create -o canmount=on rpool_$INST_UUID/$INST_ID/DATA/default/home/$myUser
 fi
 read -p "check clause worked"
-# Format and mount ESP
-for i in ${DISK}; do
- mkfs.vfat -n EFI ${i}-part1
- mkdir -p /mnt/boot/efis/${i##*/}-part1
- mount -t vfat ${i}-part1 /mnt/boot/efis/${i##*/}-part1
-done
 
-mkdir -p /mnt/boot/efi
-mount -t vfat ${INST_PRIMARY_DISK}-part1 /mnt/boot/efi
+# Format and mount ESP
+if [ -z $SEPARATEESP ]; then
+  for i in ${DISK}; do
+  mkfs.vfat -n EFI ${i}-part1
+  mkdir -p /mnt/boot/efis/${i##*/}-part1
+  mount -t vfat ${i}-part1 /mnt/boot/efis/${i##*/}-part1
+  done
+
+  mkdir -p /mnt/boot/efi
+  mount -t vfat ${INST_PRIMARY_DISK}-part1 /mnt/boot/efi
+else
+  mkdir -p /mnt/boot/efis/$ESPDISK
+  mount -t vfat $ESPDISK /mnt/boot/efis/${ESPDISK##*/}
+  mkdir -p /mnt/boot/efi
+  mount -t vfat $ESPDISK /mnt/boot/efi
+fi
 
 # Create other user datasets to omit from rollback
 zfs create -o canmount=on rpool_$INST_UUID/$INST_ID/DATA/default/var/games
@@ -223,12 +293,20 @@ echo GRUB_CMDLINE_LINUX=\"zfs_import_dir=${INST_PRIMARY_DISK%/*}\" >> /mnt/etc/d
 
 # Generate fstab
 genfstab -U /mnt | sed 's;zfs[[:space:]]*;zfs zfsutil,;g' | grep "zfs zfsutil" >> /mnt/etc/fstab
-for i in ${DISK}; do
-   echo UUID=$(blkid -s UUID -o value ${i}-part1) /boot/efis/${i##*/}-part1 vfat \
-   x-systemd.idle-timeout=1min,x-systemd.automount,noauto,umask=0022,fmask=0022,dmask=0022 0 1 >> /mnt/etc/fstab
-done
-echo UUID=$(blkid -s UUID -o value ${INST_PRIMARY_DISK}-part1) /boot/efi vfat \
-x-systemd.idle-timeout=1min,x-systemd.automount,noauto,umask=0022,fmask=0022,dmask=0022 0 1 >> /mnt/etc/fstab
+if [ -z $SEPARATEESP ]; then
+  for i in ${DISK}; do
+    echo UUID=$(blkid -s UUID -o value ${i}-part1) /boot/efis/${i##*/}-part1 vfat \
+    x-systemd.idle-timeout=1min,x-systemd.automount,noauto,umask=0022,fmask=0022,dmask=0022 0 1 >> /mnt/etc/fstab
+  done
+  echo UUID=$(blkid -s UUID -o value ${INST_PRIMARY_DISK}-part1) /boot/efi vfat \
+  x-systemd.idle-timeout=1min,x-systemd.automount,noauto,umask=0022,fmask=0022,dmask=0022 0 1 >> /mnt/etc/fstab
+else
+  echo UUID=$(blkid -s UUID -o value $ESPDISK) /boot/efis/${ESPDISK##*/} vfat \
+  x-systemd.idle-timeout=1min,x-systemd.automount,noauto,umask=0022,fmask=0022,dmask=0022 0 1 >> /mnt/etc/fstab
+  echo UUID=$(blkid -s UUID -o value ${ESPDISK##*/}) /boot/efi vfat \
+  x-systemd.idle-timeout=1min,x-systemd.automount,noauto,umask=0022,fmask=0022,dmask=0022 0 1 >> /mnt/etc/genfstab
+fi
+
 if [ "${INST_PARTSIZE_SWAP}" != "" ]; then
  for i in ${DISK}; do
   echo ${i##*/}-part4-swap ${i}-part4 /dev/urandom swap,cipher=aes-cbc-essiv:sha256,size=256,discard >> /mnt/etc/crypttab
@@ -281,5 +359,9 @@ INST_ID=$INST_ID
 INST_VDEV=$INST_VDEV
 DISK=$DISK
 INST_LOCALE=$INST_LOCALE
+SEPARATEESP=$SEPARATEESP
+ESPDISK=$ESPDISK
+SEPARATEHOME=$SEPARATEHOME
+HOMEDISK=$HOMEDISK
 myUser=$myUser" > /mnt/root/chroot
 arch-chroot /mnt ./root/chroot.sh
