@@ -26,6 +26,7 @@ pacman -Sy
 
 # Add boot environment Manager
 pacman -S --needed git base-devel
+
 # Add arcolinux repositories
 mkdir -p /root/spices
 git clone https://github.com/arcolinux/arcolinux-spices /root/spices
@@ -41,9 +42,6 @@ wget https://raw.githubusercontent.com/arcolinux/arcolinuxd-iso-git/master/archi
 sed -i '/^#/d' packages.x86_64
 sed -i '/^linux$/d' packages.x86_64
 sed -i '/^linux-headers$/d' packages.x86_64
-
-read -p "check packages.x86_64"
-
 # pacman -S - < packages.x86_64
 
 # add live iso to grub menu
@@ -96,6 +94,8 @@ passwd ${myUser}
 usermod -aG audio,video,optical,storage,network,wheel ${myUser}
 echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/20-installer
 
-git clone https://github.com/arcolinuxd/arco-leftwm
+git clone https://github.com/arcolinuxd/arco-leftwm /home/${myUser}
+chown - R ${myUser}:${myUser} arco-leftwm
+
 # Leave chroot
-#exit
+exit
