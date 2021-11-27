@@ -73,8 +73,8 @@ INST_ID=arch
 INST_PRIMARY_DISK=$(echo $DISK | cut -f1 -d\ )
 
 # Wipe SSDs - skip if not using SSDs
-[ -z $SEPARATEESP ] && blkdiscard -f $ESPDISK && done
-[ -z $SEPARATEHOME ] && blkdiscard -f $HOMEDISK && done
+# [ -z $SEPARATEESP ] && blkdiscard -f $ESPDISK && done
+[ ! -z $SEPARATEHOME ] && blkdiscard -f $HOMEDISK && done
 
 for i in ${DISK}; do
 blkdiscard -f $i &
