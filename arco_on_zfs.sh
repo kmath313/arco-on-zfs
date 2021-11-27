@@ -25,14 +25,14 @@ myUser='' # non-root username
 #*********************************************************************
 
 # Check if required variables are set.
-if [ -z "$DISK" ] && { echo "DISK is empty" ; exit 1; }
-if [ ! -z "$SEPARATEHOME" ] && if [ -z "$HOMESDISK" ] && { echo "HOMEDISK is empty"; exit 1; }
-if [ ! -z "$SEPARATEESP" ] && if [ -z "$ESPDISK" ] && { echo "ESPDISK is empty"; exit 1; }
-if [ -z "$INST_TZ" ] && { echo "Timezone not set (INST_TZ)"; exit 1; }
-if [ -z "$INST_HOSTNAME" ] && { echo "Hostname not set (INST_HOSTNAME)"; exit 1; }
-if [ -z "$INST_LOCALE" ] && { echo "Locale not set (INST_LOCALE)"; exit 1; }
-if [ -z "$INST_KEYMAP" ] && { echo "Keymap not set (INST_KEYMAP)"; exit 1; }
-if [ -z "$myUser" ] && { echo "Non-root user not set (myUser)"; exit 1; }
+[ -z "$DISK" ] && { echo "DISK is empty" ; exit 1; }
+[ ! -z "$SEPARATEHOME" ] && if [ -z "$HOMESDISK" ] && { echo "HOMEDISK is empty"; exit 1; }
+[ ! -z "$SEPARATEESP" ] && if [ -z "$ESPDISK" ] && { echo "ESPDISK is empty"; exit 1; }
+[ -z "$INST_TZ" ] && { echo "Timezone not set (INST_TZ)"; exit 1; }
+[ -z "$INST_HOSTNAME" ] && { echo "Hostname not set (INST_HOSTNAME)"; exit 1; }
+[ -z "$INST_LOCALE" ] && { echo "Locale not set (INST_LOCALE)"; exit 1; }
+[ -z "$INST_KEYMAP" ] && { echo "Keymap not set (INST_KEYMAP)"; exit 1; }
+[ -z "$myUser" ] && { echo "Non-root user not set (myUser)"; exit 1; }
 
 # Add archzfs repo to live environment
 curl -L https://archzfs.com/archzfs.gpg |  pacman-key -a -
