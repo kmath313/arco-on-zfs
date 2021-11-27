@@ -3,7 +3,14 @@
 #*********************************************************************
 # Edit these values before running the script!!!
 #*********************************************************************
+# At minimum contains boot pool and root pool,
+# if placing ESP and /home on different disks set HOMEDISK and ESPDISK below
+# If setting HOMEDISK or ESPDISK set SEPARATEHOME or SEPARATEESP as applicable else leave blank
 DISK=''
+HOMEDISK=''
+ESPDISK=''
+SEPARATEHOME=''
+SEPARATEESP=''
 INST_VDEV= # Leave empy to use single disk, other options - mirror, raidz1, raidz2, raidz3
 INST_PARTSIZE_ESP=4 # in GB
 # INST_PARTSIZE_ESP=1 # if local recovery not required
@@ -16,6 +23,16 @@ INST_LOCALE='' # eg en_US.UTF-8
 INST_KEYMAP='' # eg us
 myUser='' # non-root username
 #*********************************************************************
+
+# Check if required variables are set.
+if [ -z "$DISK" ] && { echo "DISK is empty" ; exit 1; }
+if [ ! -z "$SEPARATEHOME" ] && if [ -z "$HOMESDISK" ] && { echo "HOMEDISK is empty"; exit 1; }
+if [ ! -z "$SEPARATEESP" ] && if [ -z "$ESPDISK" ] && { echo "ESPDISK is empty"; exit 1; }
+if [ -z "$INST_TZ" ] && { echo "Timezone not set (INST_TZ)"; exit 1; }
+if [ -z "$INST_HOSTNAME" ] && { echo "Hostname not set (INST_HOSTNAME)"; exit 1; }
+if [ -z "$INST_LOCALE" ] && { echo "Locale not set (INST_LOCALE)"; exit 1; }
+if [ -z "$INST_KEYMAP" ] && { echo "Keymap not set (INST_KEYMAP)"; exit 1; }
+if [ -z "$myUser" ] && { echo "Non-root user not set (myUser)"; exit 1; }
 
 # Add archzfs repo to live environment
 curl -L https://archzfs.com/archzfs.gpg |  pacman-key -a -
