@@ -96,9 +96,6 @@ if [[ ! -z $SEPARATEESP ]]; then
   fi
   sgdisk -a1 -n5:24K:+1000K -t5:EF02 $i
   done
-elif [[ ! -z $SEPARATEHOME ]]; then
-  sgdisk --zap-all $HOMEDISK
-  sgdisk -n3:0:0  -t1:8200 $HOMEDISK
 else
   for i in ${DISK}; do
   sgdisk --zap-all $i
@@ -114,6 +111,10 @@ else
   fi
   sgdisk -a1 -n5:24K:+1000K -t5:EF02 $i
   done
+fi
+if [[ ! -z $SEPARATEHOME ]]; then
+  sgdisk --zap-all $HOMEDISK
+  sgdisk -n3:0:0  -t1:8200 $HOMEDISK
 fi
 
 sleep 5
