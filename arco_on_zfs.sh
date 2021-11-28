@@ -114,7 +114,7 @@ else
 fi
 if [[ ! -z $SEPARATEHOME ]]; then
   sgdisk --zap-all $HOMEDISK
-  sgdisk -n3:0:0  -t1:8200 $HOMEDISK
+  sgdisk -n1:0:0  -t1:8200 $HOMEDISK
 fi
 
 sleep 5
