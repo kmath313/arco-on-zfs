@@ -72,10 +72,18 @@ mkdir -p /boot/efi/EFI/arch
 mkdir -p /boot/grub
 grub-install --boot-directory /boot/efi/EFI/arch --efi-directory /boot/efi/
 grub-install --boot-directory /boot/efi/EFI/arch --efi-directory /boot/efi/ --removable
-for i in ${DISK}; do
- efibootmgr -cgp 1 -l "\EFI\arch\grubx64.efi" \
- -L "arch-${i##*/}" -d ${i}
-done
+if [ ! -z $SEPARATEESP ];
+  for i in ${ESPDISK}; do
+    echo ${i##*/} && read -p "check grub disk"
+    efibootmgr -cgp 1 -l "\EFI\arch\grubx64.efi" \
+    -L "arch-${i##*/}" -d ${i}
+  done
+else
+  for i in ${DISK}; do
+    efibootmgr -cgp 1 -l "\EFI\arch\grubx64.efi" \
+    -L "arch-${i##*/}" -d ${i}
+  done
+fi
 grub-mkconfig -o /boot/efi/EFI/arch/grub/grub.cfg
 cp /boot/efi/EFI/arch/grub/grub.cfg /boot/grub/grub.cfg
 ESP_MIRROR=$(mktemp -d)
@@ -85,7 +93,6 @@ for i in /boot/efis/*; do
 done
 
 # create user account
-zfs create $(df --output=source /home | tail -n +2)/${myUser}
 useradd -MUd /home/${myUser} -c 'My Name' ${myUser}
 zfs allow -u ${myUser} mount,snapshot,destroy $(df --output=source /home | tail -n +2)/${myUser}
 chown -R ${myUser}:${myUser} /home/${myUser}
@@ -95,7 +102,7 @@ usermod -aG audio,video,optical,storage,network,wheel ${myUser}
 echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/20-installer
 
 git clone https://github.com/arcolinuxd/arco-leftwm /home/${myUser}
-chown - R ${myUser}:${myUser} arco-leftwm
+chown -R ${myUser}:${myUser} arco-leftwm
 
 # Leave chroot
 exit
