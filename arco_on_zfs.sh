@@ -190,7 +190,7 @@ zfs create -o canmount=off -o mountpoint=none rpool_$INST_UUID/$INST_ID
 
 # Create home dataset - encryption is set on the dataset if desired
 if [[ ! -z $SEPARATEHOME ]]; then
-  zfs create -o canmount=off -o mountpoint=none hpool_$INST_UUID/DATA
+  zfs create -o canmount=off -o mountpoint=/ hpool_$INST_UUID/DATA
   # zfs create -o canmount=off -o mountpoint=none -o encryption=on -o keylocation=prompt -o keyformat=passphrase hpool_$INST_UUID/home
 fi
 
@@ -213,7 +213,6 @@ if [[ ! -z $SEPARATEHOME ]]; then
   do
     zfs create -o canmount=on rpool_$INST_UUID/$INST_ID/DATA/default/$i
   done
-  zfs create -o canmount=off -o mountpoint=/ hpool_$INST_UUID/DATA
   zfs create -o canmount=on hpool_$INST_UUID/DATA/root
   zfs create -o canmount=on hpool_$INST_UUID/DATA/home
   zfs set recordsize=1m hpool_$INST_UUID/DATA/home
