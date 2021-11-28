@@ -213,10 +213,10 @@ if [[ ! -z $SEPARATEHOME ]]; then
   do
     zfs create -o canmount=on rpool_$INST_UUID/$INST_ID/DATA/default/$i
   done
-  zfs create -o canmount=off -o mountpoint=none hpool_$INST_UUID/DATA
+  zfs create -o canmount=off -o mountpoint=/ hpool_$INST_UUID/DATA
   zfs create -o canmount=on hpool_$INST_UUID/DATA/root
   zfs create -o canmount=on hpool_$INST_UUID/DATA/home
-  zfe set recordsize=1m hpool_$INST_UUID/DATA/home
+  zfs set recordsize=1m hpool_$INST_UUID/DATA/home
 else
   for i in {home,root,srv,usr/local,var/log,var/spool};
   do
