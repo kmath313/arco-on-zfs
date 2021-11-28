@@ -209,7 +209,7 @@ do
     zfs create -o canmount=off rpool_$INST_UUID/$INST_ID/DATA/default/$i
 done
 if [[ ! -z $SEPARATEHOME ]]; then
-  for i in {srv,usr/local/var/log,var/spool};
+  for i in {srv,usr/local,var/log,var/spool};
   do
     zfs create -o canmount=on rpool_$INST_UUID/$INST_ID/DATA/default/$i
   done
