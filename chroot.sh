@@ -3,6 +3,8 @@
 # Source variables
 source /root/chroot
 
+read -p "$SEPARATEESP"
+
 # Apply locale changes
 echo "${INST_LOCALE} UTF-8" >> /etc/locale.gen
 locale-gen
@@ -72,6 +74,8 @@ mkdir -p /boot/efi/EFI/arch
 mkdir -p /boot/grub
 grub-install --boot-directory /boot/efi/EFI/arch --efi-directory /boot/efi/
 grub-install --boot-directory /boot/efi/EFI/arch --efi-directory /boot/efi/ --removable
+[ ! -z $SEPARATEESP ] && echo "true"
+read -p "paused"
 if [ ! -z $SEPARATEESP ];
   for i in ${ESPDISK}; do
     echo ${i##*/} && read -p "check grub disk"
