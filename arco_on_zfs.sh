@@ -242,7 +242,7 @@ if [ -z $SEPARATEESP ]; then
   mkdir -p /mnt/boot/efi
   mount -t vfat ${INST_PRIMARY_DISK}-part1 /mnt/boot/efi
 else
-  mkdir -p /mnt/boot/efis/$ESPDISK
+  mkdir -p /mnt/boot/efis/${ESPDISK##*/}
   mount -t vfat $ESPDISK /mnt/boot/efis/${ESPDISK##*/}
   mkdir -p /mnt/boot/efi
   mount -t vfat $ESPDISK /mnt/boot/efi
