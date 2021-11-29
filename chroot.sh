@@ -27,7 +27,7 @@ EOF
 pacman -Sy
 
 # Add boot environment Manager
-pacman -S --needed git base-devel
+pacman -S --needed --noconfirm git base-devel
 
 # Add arcolinux repositories
 mkdir -p /root/spices
@@ -35,7 +35,7 @@ git clone https://github.com/arcolinux/arcolinux-spices /root/spices
 bash /root/spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
 pacman -Sy
 
-pacman -S --needed paru-bin arcolinux-paru-git
+pacman -S --needed --noconfirm paru-bin arcolinux-paru-git
 #paru -S rozb3-pac
 read -p "check arco repo installed"
 
