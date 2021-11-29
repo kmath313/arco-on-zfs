@@ -3,8 +3,6 @@
 # Source variables
 source /root/chroot
 
-read -p "$SEPARATEESP"
-
 # Apply locale changes
 echo "${INST_LOCALE} UTF-8" >> /etc/locale.gen
 locale-gen

@@ -229,7 +229,6 @@ if [ ! -z $SEPARATEHOME ] && [ -n $myUser ]; then
 elif [ -n $myUser ]; then
   zfs create -o canmount=on rpool_$INST_UUID/$INST_ID/DATA/default/home/$myUser
 fi
-read -p "check clause worked"
 
 # Format and mount ESP
 if [ -z $SEPARATEESP ]; then
@@ -242,7 +241,6 @@ if [ -z $SEPARATEESP ]; then
   mkdir -p /mnt/boot/efi
   mount -t vfat ${INST_PRIMARY_DISK}-part1 /mnt/boot/efi
 else
-  read -p ${ESPDISK##*/}
   mkdir -p /mnt/boot/efis/${ESPDISK##*/}
   mount -t vfat $ESPDISK /mnt/boot/efis/${ESPDISK##*/}
   mkdir -p /mnt/boot/efi
