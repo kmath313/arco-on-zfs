@@ -245,8 +245,6 @@ else
   mount -t vfat $ESPDISK /mnt/boot/efis/${ESPDISK##*/}
   mkdir -p /mnt/boot/efi
   mount -t vfat $ESPDISK /mnt/boot/efi
-  df -h
-  read -p "paused"
 fi
 
 # Create other user datasets to omit from rollback
@@ -366,3 +364,5 @@ SEPARATEHOME=$SEPARATEHOME
 HOMEDISK=$HOMEDISK
 myUser=$myUser" > /mnt/root/chroot
 arch-chroot /mnt ./root/chroot.sh
+
+read -p "Chroot script finished."
