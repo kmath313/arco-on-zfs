@@ -74,7 +74,7 @@ grub-install --boot-directory /boot/efi/EFI/arch --efi-directory /boot/efi/
 grub-install --boot-directory /boot/efi/EFI/arch --efi-directory /boot/efi/ --removable
 [ ! -z $SEPARATEESP ] && echo "true"
 read -p "paused"
-if [ ! -z $SEPARATEESP ];
+if [[ ! -z $SEPARATEESP ]]; then
   for i in ${ESPDISK}; do
     echo ${i##*/} && read -p "check grub disk"
     efibootmgr -cgp 1 -l "\EFI\arch\grubx64.efi" \
