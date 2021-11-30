@@ -349,6 +349,7 @@ systemctl disable zfs-mount --root=/mnt
 # Copy script to execute in chroot
 chmod +x chroot.sh
 cp chroot.sh /mnt/root
+cp arch-arcod_packages /mnt/root
 
 # chroot
 echo "INST_PRIMARY_DISK=$INST_PRIMARY_DISK

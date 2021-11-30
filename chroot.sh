@@ -33,7 +33,7 @@ git clone https://github.com/arcolinux/arcolinux-spices /root/spices
 bash /root/spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
 pacman -Sy
 
-pacman -S --needed --noconfirm paru-bin arcolinux-paru-git arcolinux-root-git
+pacman -S --needed --noconfirm - < /root/arch-arcod_packages #paru-bin arcolinux-paru-git arcolinux-root-git arcolinux-meta-fun neofetch arcolinux-neofetch-git
 
 # add live iso to grub menu
 mkdir /boot/efi/iso
@@ -100,4 +100,3 @@ chown -R ${myUser}:${myUser} arco-leftwm
 
 # Leave chroot
 exit
-1
