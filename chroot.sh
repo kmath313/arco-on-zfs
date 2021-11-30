@@ -95,8 +95,9 @@ usermod -aG audio,video,optical,storage,network,wheel ${myUser}
 echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/20-installer
 cp -arf /etc/skel/.bashrc /home/${myUser}
 
-git clone https://github.com/arcolinuxd/arco-leftwm /home/${myUser}/
-chown -R ${myUser}:${myUser} arco-leftwm
+mkdir -p /home/${myUser}/arco-leftwm
+git clone https://github.com/arcolinuxd/arco-leftwm /home/${myUser}/arco-leftwm
+chown -R ${myUser}:${myUser} /home/${myUser}/arco-leftwm
 
 # Leave chroot
 exit
