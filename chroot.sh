@@ -22,18 +22,16 @@ tee -a /etc/pacman.conf <<- 'EOF'
 [archzfs]
 Include = /etc/pacman.d/mirrorlist-archzfs
 EOF
-pacman -Sy
 
-# Add boot environment Manager
-pacman -S --needed --noconfirm git base-devel
+# Add git and base devel so that can pull Arcolinux Spices Application
+pacman -Sy --needed --noconfirm git base-devel
 
 # Add arcolinux repositories
 mkdir -p /root/spices
 git clone https://github.com/arcolinux/arcolinux-spices /root/spices
 bash /root/spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
-pacman -Sy
 
-pacman -S --needed --noconfirm - < /root/arch-arcod_packages #paru-bin arcolinux-paru-git arcolinux-root-git arcolinux-meta-fun neofetch arcolinux-neofetch-git
+pacman -Sy --needed --noconfirm - < /root/arch-arcod_packages #paru-bin arcolinux-paru-git arcolinux-root-git arcolinux-meta-fun neofetch arcolinux-neofetch-git
 
 # add live iso to grub menu
 mkdir /boot/efi/iso
@@ -47,7 +45,6 @@ chmod +x /etc/grub.d/43_archiso
 # Add grub probe fix
 echo 'export ZPOOL_VDEV_NAME_PATH=YES' >> /etc/profile.d/zpool_vdev_name_path.sh
 source /etc/profile.d/zpool_vdev_name_path.sh
-pacman -S --noconfirm --needed sudo
 echo 'Defaults env_keep += "ZPOOL_VDEV_NAME_PATH"' >> /etc/sudoers
 
 # Fix pool name missing
@@ -93,11 +90,12 @@ echo "Set password for $myUser"
 passwd ${myUser}
 usermod -aG audio,video,optical,storage,network,wheel ${myUser}
 echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/20-installer
-cp -arf /etc/skel/.bashrc /home/${myUser}
+cp -arf /etc/skel/* /home/${myUser}
 
 mkdir -p /home/${myUser}/arco-leftwm
 git clone https://github.com/arcolinuxd/arco-leftwm /home/${myUser}/arco-leftwm
 chown -R ${myUser}:${myUser} /home/${myUser}/arco-leftwm
+
 
 # Leave chroot
 exit

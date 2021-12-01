@@ -87,6 +87,7 @@ arcolinux-neofetch-git
 arcolinux-paru-git
 arcolinuxd-system-config-git
 arcolinux-systemd-services-git
+arcolinux-bin-git
 arco-calamares
 arcolinux-welcome-app-git
 ckbcomp
@@ -115,3 +116,4 @@ xfce4-settings
 xfdesktop
 xfwm4
 chaotic-keyring
+sudo
